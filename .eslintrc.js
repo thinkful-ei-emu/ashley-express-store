@@ -24,6 +24,7 @@ module.exports = {
     "plugins": [
         "react",
         "prettier"
+        
     ],
     "rules": {
         "strict": ["error", "safe"],   //prefer `'use-strict';` pragma        

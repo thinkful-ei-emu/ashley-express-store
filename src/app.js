@@ -12,7 +12,11 @@ app.use(cors());
 app.use(helmet());
 
 app.get('/', (req, res) => {
-  res.send('Hello, boilerplate!');
+  res.send('A GET Request');
+});
+
+app.post('/', (req, res) => {
+  res.send('POST request received.');
 });
 
 app.use(function errorHandler(error, req, res, next) {
@@ -21,7 +25,7 @@ app.use(function errorHandler(error, req, res, next) {
     response = { error: { message: 'server error' } };
   } else {
     console.error(error);
-    response = { message: error.message, error };
+    response = {message: error.message, error};
   }
   res.status(500).json(response);
 });
