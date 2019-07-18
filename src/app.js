@@ -5,12 +5,29 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 const app = express();
-
 const morganOptions = NODE_ENV === 'production' ? 'common' : 'dev';
 app.use(morgan(morganOptions));
 app.use(express.json());
+const uuid = require('uuid/v4');
+const users = [
+  {
+    id: '3c8da4d5-1597-46e7-baa1-e402aed70d80',
+    username: 'sallyStudent',
+    password: 'c00d1ng1sc00l',
+    favoriteClub: 'Cache Valley Stone Society',
+    newsLetter: 'true'
+  },
+  {
+    id: 'ce20079c-2326-4f17-8ac4-f617bfd28b7f',
+    username: 'johnBlocton',
+    password: 'veryg00dpassw0rd',
+    favoriteClub: 'Salt City Curling Club',
+    newsLetter: 'false'
+  }
+];
 app.use(cors());
 app.use(helmet());
+
 
 app.get('/', (req, res) => {
   res.send('A GET Request');
@@ -19,7 +36,7 @@ app.get('/', (req, res) => {
 app.post('/register', (req, res) => {
   //get the data
   const { username, password, favoriteClub, newsLetter = false } = req.body;
-  res.send('POST request received.');
+
   //validation code here
   if (!username) {
     return res.status(400).send('Username required');
@@ -54,9 +71,41 @@ app.post('/register', (req, res) => {
     return res.status(400).send('Not a valid club');
   }
 
+  const id = uuid();
+  const newUser = {
+    id,
+    username,
+    password,
+    favoriteClub,
+    newsLetter
+  };
+
+  users.push(newUser);
+
+  res
+    .status(201)
+    .location(`http://localhost:8000/user/${id}`)
+    .json({ id: id });
+
   //at this point all validation passed
   res.send('All validation passed');
 });
+
+app.get('/user', (req, res) => {
+  res.json(users);
+});
+
+app.delete('/user/:userId', (req, res) => {
+  const { userId } = req.params;
+  const index = users.findIndex(u => u.id === userId);
+  if (index === -1) {
+    return res.status(404).send('User not found');
+  }
+  users.splice(index, 1);
+  res.status('204').end();
+})
+
+
 
 app.use(function errorHandler(error, req, res, next) {
   let response;
